@@ -12,11 +12,10 @@ import logging
 import pysftp
 import shutil
 
-
 #Set logging config
 logging.basicConfig(
     filename="upload.log",
-    level=logging.DEBUG,
+    level=logging.INFO,
     datefmt='%d-%b-%y %H:%M:%S',
     format='%(asctime)s - %(levelname)s - %(message)s'
     )
@@ -72,14 +71,14 @@ def upload_files(files_to_upload, local_dir, remote_dir, remote_server, username
         Returns:
             None
     '''
-    logging.info(f' upload_files(\n{files_to_upload}, \n{local_dir}, \n{remote_dir}, \n{remote_server}, \n{username}, \n{private_key})\n has been called.')
+    logging.info(f' upload_files({files_to_upload}, {local_dir}, {remote_dir}, {remote_server}, {username}, {private_key}) has been called.')
     hostname = remote_server
     username = username
     private_key = private_key
 
     # TODO: This is currently failing and I'm not sure why. Might be a bug based on somethings i Found from last year.
     # going to see if i can dig further. 
-    with pysftp.Connection(host=hostname, username=username, private_key=private_key, log='sftp.log') as sftp:
+    with pysftp.Connection(host=hostname, username=username, private_key=private_key) as sftp:
         logging.info("Established connection to Jellyfin server.")
 
         for file in files_to_upload:
@@ -100,14 +99,19 @@ def move_local_to_backup(files_to_move, current_folder, backup_location):
             current_folder (str) : Current folder where the files_to_move list resides.
             backup_location (str) : End location for the files we want to move out of the backup folder. 
     '''
+    logging.info(f"move_local_to_backup({files_to_move}, {current_folder}, {backup_location}) has been called.")
+
     for file in files_to_move:
+        logging.info(f'Backing up: {file} to {backup_location}')
         current_location = f'{current_folder}\\{file}'
         end_location = f'{backup_location}\\{file}'
         shutil.move(current_location, end_location)
 
 
 def main_script():
+    '''main controller of the scripts running.'''
     logging.info(f"main_script() has been called")
+
     # TODO: Look to see if i can make this any less hard coded.
     FILE_LOCATION = f"{os.getcwd()}\\AddToJellyfin\\fileinfo.json"
 
@@ -134,6 +138,10 @@ def main_script():
         logging.info(f"         {movie}")
         movies += 1
     logging.info(f"Number of Movies to upload: {movies}")
+
+    if movies == 0:
+        logging.info(f'There are no movies to upload. Ending')
+        return None
 
     # Upload data to remote server.
     upload_files(
