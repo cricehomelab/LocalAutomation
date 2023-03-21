@@ -1,9 +1,10 @@
 """
-1. Get data from fileinfo.json
-2. Get list of movies to upload
+1. Get data from fileinfo.json.
+2. Get list of movies to upload.
 3. Connect to jellyfin server with correct access.
-4. Path to correct directory
-5. Upload file
+4. Path to correct directory.
+5. Upload file.
+6. Move files to backup directory.
 """
 
 import json
