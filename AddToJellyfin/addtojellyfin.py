@@ -10,6 +10,8 @@ import json
 import os
 import logging
 import pysftp
+import shutil
+
 
 #Set logging config
 logging.basicConfig(
@@ -50,19 +52,19 @@ def get_list_of_files(directory):
     files_to_transfer = []
     for file in files_in_directory:
         if file.endswith('.m4v'):
-            file = f'{directory}\\{file}'
             logging.info(f'Adding {file} to list of files to transfer.')
             files_to_transfer.append(file)
     logging.info("Completed aggregating list of files to transfer returning list.")
     return files_to_transfer
 
-def upload_files(files_to_upload, remote_dir, remote_server, username, private_key):
+def upload_files(files_to_upload, local_dir, remote_dir, remote_server, username, private_key):
     '''
     uploads a list of files to the remote Jellyfin server.
 
         Parameters:
             files_to_upload (list): Fully qualified filepaths of the files we want to upload.
             remote_dir (str): Directory on the remote Jellyfin server we want to upload to.
+            local_dir (str): Local Directory where movies are located.
             remote_server (str): IP address for the Jellyfin server.
             username (str): username for the sftp conncetion.
             private_key (str): private key for the sftp connection.
@@ -70,26 +72,39 @@ def upload_files(files_to_upload, remote_dir, remote_server, username, private_k
         Returns:
             None
     '''
-
+    logging.info(f' upload_files(\n{files_to_upload}, \n{local_dir}, \n{remote_dir}, \n{remote_server}, \n{username}, \n{private_key})\n has been called.')
     hostname = remote_server
     username = username
     private_key = private_key
 
     # TODO: This is currently failing and I'm not sure why. Might be a bug based on somethings i Found from last year.
     # going to see if i can dig further. 
-    with pysftp.Connection(host=hostname, username=username, private_key=private_key) as sftp:
+    with pysftp.Connection(host=hostname, username=username, private_key=private_key, log='sftp.log') as sftp:
         logging.info("Established connection to Jellyfin server.")
 
         for file in files_to_upload:
             logging.info(f'Uploading {file}...')
 
-            remote_directory = remote_dir
-            local_filepath = file
+            remote_directory = f'{remote_dir}/{file}'
+            local_filepath = f'{local_dir}\\{file}'
 
             sftp.put(local_filepath, remote_directory)
 
-
     logging.info("Files uploaded.")
+
+def move_local_to_backup(files_to_move, current_folder, backup_location):
+    '''
+    moves files that have been put on the Jellyfin server to the backup folder.
+        Parameters:
+            files_to_move (list) : List of files that need moved from the copied folder to the backup folder.
+            current_folder (str) : Current folder where the files_to_move list resides.
+            backup_location (str) : End location for the files we want to move out of the backup folder. 
+    '''
+    for file in files_to_move:
+        current_location = f'{current_folder}\\{file}'
+        end_location = f'{backup_location}\\{file}'
+        shutil.move(current_location, end_location)
+
 
 def main_script():
     logging.info(f"main_script() has been called")
@@ -108,6 +123,8 @@ def main_script():
     logging.debug(f'Remote directory we are uploading movies to: {remote_dir}')
     remote_username = json_data['remote_server_username']
     logging.debug(f"Remote server username is: {remote_username}")
+    backup_location = json_data['backup_folder_location']
+    logging.debug(f'Backup folder location: {backup_location}')
 
     # Seeing what movies are in the file.
     files_to_transfer = get_list_of_files(local_dir)
@@ -121,11 +138,18 @@ def main_script():
     # Upload data to remote server.
     upload_files(
         files_to_upload=files_to_transfer,
+        local_dir=local_dir,
         remote_dir=remote_dir,
         remote_server=remote_server,
         username=remote_username,
         private_key=private_key
     )
 
+    # Move the remaining copy to the backup folder.
+    move_local_to_backup(
+        files_to_move=files_to_transfer,
+        current_folder=local_dir,
+        backup_location=backup_location
+    )
 
 main_script()
