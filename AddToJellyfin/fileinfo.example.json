@@ -1,0 +1,7 @@
+{
+    "movie_local_dir": "C:\\Users\\blah\\Videos\\ToUpload\\Movies",
+    "remote_server": "192.168.50.111",
+    "remote_server_movie_dir": "/home/dir/newvideos",
+    "remote_server_private_key": "c:\\Users\\user\\.ssh\\privatekey",
+    "remote_server_username" : "username"
+}
