@@ -31,6 +31,7 @@ def get_json_data(file):
         Returns:
             data (str): Data contained within the fileinfo.json file.
     '''
+
     logging.info(f"get_json_data({file}) has been called.")
     f = open(file)
     data = json.load(f)
@@ -47,6 +48,7 @@ def get_list_of_files(directory):
         Returns:
             files_to_transfer (list): This is a list of files that are going to be transferred.
     '''
+
     logging.info(f"get_list_of_files({directory}) has been called.")
     files_in_directory = os.listdir(directory)
     files_to_transfer = []
@@ -72,6 +74,7 @@ def upload_files(files_to_upload, local_dir, remote_dir, remote_server, username
         Returns:
             None
     '''
+
     logging.info(f' upload_files({files_to_upload}, {local_dir}, {remote_dir}, {remote_server}, {username}, {private_key}) has been called.')
     hostname = remote_server
     username = username
@@ -100,6 +103,7 @@ def move_local_to_backup(files_to_move, current_folder, backup_location):
             current_folder (str) : Current folder where the files_to_move list resides.
             backup_location (str) : End location for the files we want to move out of the backup folder. 
     '''
+
     logging.info(f"move_local_to_backup({files_to_move}, {current_folder}, {backup_location}) has been called.")
 
     for file in files_to_move:
@@ -111,6 +115,7 @@ def move_local_to_backup(files_to_move, current_folder, backup_location):
 
 def main_script():
     '''main controller of the scripts running.'''
+
     logging.info(f"main_script() has been called")
 
     # TODO: Look to see if i can make this any less hard coded.
