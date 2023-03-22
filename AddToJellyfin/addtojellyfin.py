@@ -31,7 +31,7 @@ def get_json_data(file):
         Returns:
             data (str): Data contained within the fileinfo.json file.
     '''
-
+    print(file)
     logging.info(f"get_json_data({file}) has been called.")
     f = open(file)
     data = json.load(f)
@@ -119,7 +119,8 @@ def main_script():
     logging.info(f"main_script() has been called")
 
     # TODO: Look to see if i can make this any less hard coded.
-    FILE_LOCATION = f"{os.getcwd()}\\AddToJellyfin\\fileinfo.json"
+    FILE_LOCATION = f'{os.getcwd()}\\AddToJellyfin\\fileinfo.json'
+    print(FILE_LOCATION)
 
     # Getting data from JSON and putting into variables. 
     json_data = get_json_data(FILE_LOCATION)
