@@ -116,6 +116,7 @@ def move_local_to_backup(files_to_move, current_folder, backup_location):
 def main_script():
     '''main controller of the scripts running.'''
 
+    logging.info(f'****Starting Script****')
     logging.info(f"main_script() has been called")
 
     # TODO: Look to see if i can make this any less hard coded.
@@ -166,5 +167,7 @@ def main_script():
         current_folder=local_dir,
         backup_location=backup_location
     )
+
+    logging.info(f'****End script****')
 
 main_script()
